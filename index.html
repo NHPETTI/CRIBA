@@ -12,7 +12,6 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
   <meta http-equiv="x-ua-compatible" content="IE=edge" />
-  
   <style>
     html {
       height: 100%;
@@ -29,42 +28,50 @@
       background-color: #000000;
     }
 
-    /* Botón VR manual */
-    .vr-button {
+    /* Botón VOLVER */
+    .back-button {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
+      top: 20px;
+      left: 20px;
       background-color: #024731;
-      color: white;
+      color: #ffffff;
       border: none;
-      padding: 15px 20px;
-      border-radius: 50px;
+      padding: 12px 20px;
+      border-radius: 8px;
       font-size: 16px;
       font-weight: bold;
       cursor: pointer;
       z-index: 2000;
-      box-shadow: 0 4px 15px rgba(2, 71, 49, 0.4);
       transition: all 0.3s ease;
+      box-shadow: 0 2px 10px rgba(2, 71, 49, 0.3);
     }
 
-    .vr-button:hover {
+    .back-button:hover {
       background-color: #035a42;
-      transform: scale(1.05);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(2, 71, 49, 0.4);
     }
 
-    .vr-button:disabled {
-      background-color: #666;
-      cursor: not-allowed;
-      opacity: 0.5;
+    .back-button:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(2, 71, 49, 0.3);
+    }
+
+    /* Responsive para móviles */
+    @media (max-width: 768px) {
+      .back-button {
+        top: 15px;
+        left: 15px;
+        padding: 10px 16px;
+        font-size: 14px;
+      }
     }
   </style>
 </head>
 <body>
 
-<!-- Botón VR manual -->
-<button id="vr-button" class="vr-button" onclick="openVRWindow()">
-  🥽 Abrir en VR
-</button>
+<!-- Botón VOLVER -->
+<button class="back-button" onclick="goBack()">< VOLVER</button>
 
 <canvas id="image_helper" style="width: 0; display: none"></canvas>
 
@@ -85,31 +92,33 @@
   </noscript>
   <script>
     const isPc = false;
-
-    // Detectar si estamos en popup
-    const isPopup = window.opener !== null || window.parent !== window;
     
-    // Función para abrir en ventana principal con VR
-    function openVRWindow() {
-      const currentUrl = window.location.href;
-      const vrUrl = currentUrl + (currentUrl.includes('?') ? '&' : '?') + 'vr=enabled';
-      
-      // Abrir en ventana principal con configuración VR
-      const vrWindow = window.open(
-        vrUrl,
-        '_blank',
-        'width=' + screen.width + ',height=' + screen.height + ',fullscreen=yes,toolbar=no,menubar=no,scrollbars=no,location=no'
-      );
-      
-      if (vrWindow) {
-        vrWindow.focus();
-        // Opcional: cerrar popup actual
-        // window.close();
+    // Función para volver/cerrar ventana
+    function goBack() {
+      try {
+        // Intentar cerrar la ventana primero
+        window.close();
+        
+        // Si no se puede cerrar, ir atrás en el historial
+        setTimeout(() => {
+          if (window.history.length > 1) {
+            window.history.back();
+          } else {
+            // Fallback: ir a página principal
+            window.location.href = '/';
+          }
+        }, 100);
+      } catch (error) {
+        // Si hay error, ir atrás en el historial
+        if (window.history.length > 1) {
+          window.history.back();
+        } else {
+          window.location.href = '/';
+        }
       }
     }
-
-    // Configurar tour según contexto
-    const tourConfig = {
+    
+    embedpano({
       xml: "tour.xml",
       target: "pano",
       passQueryParameters: "startscene,startlookat",
@@ -117,43 +126,10 @@
         dollhouseEnable: "true",
         punlicPath: "..",
         imagePx: "",
-        curtime: "",
-      }
-    };
+        curtime:"",
+      },
 
-    // Si NO es popup O tiene parámetro VR, habilitar VR
-    const hasVRParam = window.location.search.includes('vr=enabled');
-    if (!isPopup || hasVRParam) {
-      // Configuración VR completa
-      tourConfig.initvars.webvr = "auto";
-      tourConfig.initvars.webvr_keeplookingdirection = "true";
-      tourConfig.initvars.webvr_prev_next_hotspots = "true";
-      tourConfig.initvars.gyro = "true";
-      tourConfig.initvars.gyro_offset = "0";
-      
-      // Ocultar botón VR si ya está habilitado
-      document.getElementById('vr-button').style.display = 'none';
-    } else {
-      // En popup, mostrar botón para abrir VR
-      tourConfig.initvars.webvr = "false";
-      tourConfig.initvars.gyro = "false";
-    }
-
-    // Inicializar tour
-    embedpano(tourConfig);
-
-    // Solicitar permisos si VR está habilitado
-    if (!isPopup || hasVRParam) {
-      setTimeout(() => {
-        if ('DeviceMotionEvent' in window && typeof DeviceMotionEvent.requestPermission === 'function') {
-          DeviceMotionEvent.requestPermission().catch(console.warn);
-        }
-        
-        if ('DeviceOrientationEvent' in window && typeof DeviceOrientationEvent.requestPermission === 'function') {
-          DeviceOrientationEvent.requestPermission().catch(console.warn);
-        }
-      }, 1000);
-    }
+    });
   </script>
 </div>
 </body>
