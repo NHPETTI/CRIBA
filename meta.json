@@ -1,0 +1,139 @@
+﻿{
+	"sceneArray": [
+		{
+			"cameraPos":
+			{
+				"x": 290.32182431372945,
+				"y": 1691.2509077066907,
+				"z": 2118.3518962722255
+			},
+			"cameraRotate":
+			{
+				"x": -89.724806275018651,
+				"y": -0.39052129536867142,
+				"z": 0
+			},
+			"relativePos":
+			{
+				"x": 0,
+				"y": 0,
+				"z": 0
+			},
+			"relativeYaw": 0,
+			"imageDir": "images/e0a608f42e6447ea9eb999b9b6c8d895",
+			"tilesDir": "tiles/e0a608f42e6447ea9eb999b9b6c8d895",
+			"depthImageUrl": "images/e0a608f42e6447ea9eb999b9b6c8d895_ZDepth.png",
+			"normalImageUrl": "images/e0a608f42e6447ea9eb999b9b6c8d895_Normal.png",
+			"sceneName": "scene_e0a608f42e6447ea9eb999b9b6c8d895",
+			"sceneTitle": "Sin título 1",
+			"hotspotArray": [
+				{
+					"hotspotName": "hotspot_e0a608f42e6447ea9eb999b9b6c8d895_to_c379e524b072472c9b1c820f90582778",
+					"srcScene": "scene_e0a608f42e6447ea9eb999b9b6c8d895",
+					"dstScene": "scene_c379e524b072472c9b1c820f90582778",
+					"hotspotSphereCoord":
+					{
+						"x": 6.2166660892115715,
+						"y": 22.834514339584533,
+						"z": 0
+					},
+					"hotspot3DCoord":
+					{
+						"x": 34.809082025666605,
+						"y": 135.35201834253803,
+						"z": 319.55728035708717
+					},
+					"hotspotRotate":
+					{
+						"x": 90,
+						"y": 0,
+						"z": 0
+					},
+					"distance": 348.78173828125,
+					"depth": 0,
+					"cameraPointType": "Floor"
+				}
+			],
+			"startScene": true,
+			"thumbnailPath": "PanoThumbnail/aeb0f4f18f1b4773b609cf8625c3b4cd.png",
+			"depthWhiteDistance": 3000,
+			"depthBlackDistance": 0,
+			"sceneCameraPivotType": "Floor",
+			"resolution": "16K",
+			"colorImageUrl": "images/e0a608f42e6447ea9eb999b9b6c8d895.png",
+			"bgImageUrl": "images/e0a608f42e6447ea9eb999b9b6c8d895_bg.png"
+		},
+		{
+			"cameraPos":
+			{
+				"x": 326.66533358089509,
+				"y": 1371.8644745531251,
+				"z": 2128.0001976800559
+			},
+			"cameraRotate":
+			{
+				"x": 101.33914666594809,
+				"y": -0.29374688118696213,
+				"z": 0
+			},
+			"relativePos":
+			{
+				"x": 34.809071236800676,
+				"y": -9.6483014078303313,
+				"z": 319.55730770558341
+			},
+			"relativeYaw": 191.06394958496094,
+			"imageDir": "images/c379e524b072472c9b1c820f90582778",
+			"tilesDir": "tiles/c379e524b072472c9b1c820f90582778",
+			"depthImageUrl": "images/c379e524b072472c9b1c820f90582778_ZDepth.png",
+			"normalImageUrl": "images/c379e524b072472c9b1c820f90582778_Normal.png",
+			"sceneName": "scene_c379e524b072472c9b1c820f90582778",
+			"sceneTitle": "Sin título 2",
+			"hotspotArray": [
+				{
+					"hotspotName": "hotspot_c379e524b072472c9b1c820f90582778_to_e0a608f42e6447ea9eb999b9b6c8d895",
+					"srcScene": "scene_c379e524b072472c9b1c820f90582778",
+					"dstScene": "scene_e0a608f42e6447ea9eb999b9b6c8d895",
+					"hotspotSphereCoord":
+					{
+						"x": -4.8472907098966971,
+						"y": 24.279445892421993,
+						"z": 0
+					},
+					"hotspot3DCoord":
+					{
+						"x": 1.3809424340965079e-05,
+						"y": 135.35201834253803,
+						"z": 5.3281444661598958e-05
+					},
+					"hotspotRotate":
+					{
+						"x": 90,
+						"y": 0,
+						"z": 0
+					},
+					"distance": 352.6380615234375,
+					"depth": 0,
+					"cameraPointType": "Floor"
+				}
+			],
+			"startScene": false,
+			"thumbnailPath": "PanoThumbnail/5e2ccf7da54b47e28f4cb33fb9854b0f.png",
+			"depthWhiteDistance": 3000,
+			"depthBlackDistance": 0,
+			"sceneCameraPivotType": "Floor",
+			"resolution": "16K",
+			"colorImageUrl": "images/c379e524b072472c9b1c820f90582778.png",
+			"bgImageUrl": "images/c379e524b072472c9b1c820f90582778_bg.png"
+		}
+	],
+	"pivotColor":
+	{
+		"r": 0.14699999988079071,
+		"g": 0.73799997568130493,
+		"b": 0.98199999332427979,
+		"a": 1
+	},
+	"region": "usa",
+	"version": "2.10.0"
+}
