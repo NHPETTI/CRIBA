@@ -93,23 +93,9 @@
   <script>
     const isPc = false;
     
-    // Función para volver a la página anterior del historial
-    function goBack() {
-  try {
-    // Verificar si hay historial disponible
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      // Si no hay historial, mostrar mensaje o redirigir
-      console.log('No hay páginas anteriores en el historial');
-      // Opcional: redirigir a una página específica
-      // window.location.href = '/inicio';
-    }
-  } catch (error) {
-    console.error('Error al navegar hacia atrás:', error);
-    // Fallback: intentar redirigir a la página anterior
-    window.location.href = document.referrer || '/';
-  }
+    // Función para volver a la página principal
+function goBack() {
+  window.location.href = 'https://v0-immersive-360-web.vercel.app/';
 }
     
     embedpano({
