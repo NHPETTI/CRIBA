@@ -1,7 +1,7 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
-  <title>D5VirtualTour</title>
+  <title>Mi Tour Virtual Personalizado</title>
   <meta
           name="viewport"
           content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, viewport-fit=cover"
@@ -12,6 +12,12 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
   <meta http-equiv="x-ua-compatible" content="IE=edge" />
+  
+  <!-- Meta tags adicionales para SEO -->
+  <meta name="description" content="Tour virtual interactivo de alta calidad" />
+  <meta name="keywords" content="tour virtual, 360, panorama, inmersivo" />
+  <meta name="author" content="Tu Nombre" />
+  
   <style>
     html {
       height: 100%;
@@ -22,14 +28,179 @@
       overflow: hidden;
       margin: 0;
       padding: 0;
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       font-size: 16px;
       color: #ffffff;
       background-color: #000000;
     }
+
+    /* Loader personalizado */
+    .loader {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid #333;
+      border-top: 3px solid #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loader-text {
+      color: #fff;
+      font-size: 18px;
+      text-align: center;
+    }
+
+    /* Header personalizado */
+    .tour-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 15px 20px;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .tour-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .tour-controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    .control-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .control-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Footer personalizado */
+    .tour-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px 20px;
+      z-index: 1000;
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .footer-text {
+      font-size: 14px;
+      color: #ccc;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .tour-header {
+        padding: 10px 15px;
+      }
+      
+      .tour-title {
+        font-size: 18px;
+      }
+      
+      .control-btn {
+        padding: 6px 12px;
+        font-size: 14px;
+      }
+    }
+
+    /* Botón VOLVER */
+    .back-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: #024731;
+      color: #ffffff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 2000;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 10px rgba(2, 71, 49, 0.3);
+    }
+
+    .back-button:hover {
+      background-color: #035a42;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(2, 71, 49, 0.4);
+    }
+
+    .back-button:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(2, 71, 49, 0.3);
+    }
+
+    /* Responsive para móviles */
+    @media (max-width: 768px) {
+      .back-button {
+        top: 15px;
+        left: 15px;
+        padding: 10px 16px;
+        font-size: 14px;
+      }
+    }
   </style>
 </head>
 <body>
+
+<!-- Botón VOLVER -->
+<button class="back-button" onclick="goBack()">VOLVER</button>
+
+<!-- Loader personalizado -->
+<div id="loader" class="loader">
+  <div class="spinner"></div>
+  <div class="loader-text">Cargando tour virtual...</div>
+</div>
+
+<!-- Header personalizado -->
+<div class="tour-header">
+  <div class="tour-title">Mi Tour Virtual</div>
+  <div class="tour-controls">
+    <button class="control-btn" onclick="toggleFullscreen()">Pantalla Completa</button>
+    <button class="control-btn" onclick="resetView()">Reiniciar Vista</button>
+  </div>
+</div>
+
 <canvas id="image_helper" style="width: 0; display: none"></canvas>
 
 <script src="tour.js"></script>
@@ -41,14 +212,46 @@
       <tr style="vertical-align: middle">
         <td>
           <div style="text-align: center">
-            ERROR:<br /><br />Javascript not activated<br /><br />
+            ERROR:<br /><br />Javascript no está activado<br /><br />
+            Por favor, activa JavaScript para ver el tour virtual.
           </div>
         </td>
       </tr>
     </table>
   </noscript>
+  
   <script>
-    const isPc = false;
+    const isPc = /Windows|Mac|Linux/.test(navigator.userAgent) && !/Mobile|Tablet/.test(navigator.userAgent);
+    
+    // Ocultar loader cuando el tour esté listo
+    function hideLoader() {
+      const loader = document.getElementById('loader');
+      if (loader) {
+        loader.style.opacity = '0';
+        setTimeout(() => {
+          loader.style.display = 'none';
+        }, 500);
+      }
+    }
+
+    // Función para pantalla completa
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    // Función para reiniciar vista
+    function resetView() {
+      // Esta función dependerá de la API de D5
+      if (typeof krpano !== 'undefined') {
+        krpano.call('lookto(0,0,90)');
+      }
+    }
+
+    // Configuración del tour
     embedpano({
       xml: "tour.xml",
       target: "pano",
@@ -57,11 +260,40 @@
         dollhouseEnable: "true",
         punlicPath: "..",
         imagePx: "",
-        curtime:"",
+        curtime: new Date().getTime(),
       },
-
+      onready: function() {
+        // Ocultar loader cuando esté listo
+        setTimeout(hideLoader, 1000);
+        console.log("Tour virtual cargado correctamente");
+      }
     });
+
+    // Analytics personalizado (opcional)
+    function trackTourEvent(action, scene) {
+      console.log(`Tour Event: ${action} - Scene: ${scene}`);
+      // Aquí puedes agregar Google Analytics o similar
+    }
+
+    // Función para volver a la página anterior
+    function goBack() {
+      // Verificar si hay historial disponible
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        // Si no hay historial, redirigir a una página por defecto
+        window.location.href = '/';
+      }
+    }
   </script>
 </div>
+
+<!-- Footer personalizado -->
+<div class="tour-footer">
+  <div class="footer-text">
+    © 2024 Mi Empresa - Tour Virtual Interactivo
+  </div>
+</div>
+
 </body>
 </html>
