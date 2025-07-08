@@ -12,6 +12,10 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
   <meta http-equiv="x-ua-compatible" content="IE=edge" />
+  
+  <!-- Permisos adicionales para VR -->
+  <meta http-equiv="Permissions-Policy" content="xr-spatial-tracking=*, gyroscope=*, accelerometer=*, magnetometer=*" />
+  
   <style>
     html {
       height: 100%;
@@ -28,50 +32,47 @@
       background-color: #000000;
     }
 
-    /* Botón VOLVER - SOLO ESTA PARTE ES NUEVA */
-    .back-button {
+    /* Alerta para popup */
+    .popup-warning {
       position: fixed;
-      top: 20px;
-      left: 20px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      z-index: 3000;
+      max-width: 400px;
+      border: 2px solid #024731;
+    }
+
+    .popup-warning button {
       background-color: #024731;
-      color: #ffffff;
+      color: white;
       border: none;
-      padding: 12px 20px;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: bold;
+      padding: 10px 20px;
+      border-radius: 5px;
+      margin: 10px;
       cursor: pointer;
-      z-index: 2000;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 10px rgba(2, 71, 49, 0.3);
+      font-size: 16px;
     }
 
-    .back-button:hover {
+    .popup-warning button:hover {
       background-color: #035a42;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 15px rgba(2, 71, 49, 0.4);
-    }
-
-    .back-button:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 8px rgba(2, 71, 49, 0.3);
-    }
-
-    /* Responsive para móviles */
-    @media (max-width: 768px) {
-      .back-button {
-        top: 15px;
-        left: 15px;
-        padding: 10px 16px;
-        font-size: 14px;
-      }
     }
   </style>
 </head>
 <body>
 
-<!-- Botón VOLVER - SOLO ESTA LÍNEA ES NUEVA -->
-<button class="back-button" onclick="goBack()">VOLVER</button>
+<!-- Alerta para popup (se muestra solo si es necesario) -->
+<div id="popup-warning" class="popup-warning" style="display: none;">
+  <h3>⚠️ Modo VR No Disponible</h3>
+  <p>Para usar lentes de Realidad Virtual, necesitas abrir este tour en una ventana principal.</p>
+  <button onclick="openInMainWindow()">Abrir en Ventana Principal</button>
+  <button onclick="continueInPopup()">Continuar Sin VR</button>
+</div>
 
 <canvas id="image_helper" style="width: 0; display: none"></canvas>
 
@@ -92,11 +93,93 @@
   </noscript>
   <script>
     const isPc = false;
-    
-    // Función para volver a la página principal
-function goBack() {
-  window.location.href = 'https://v0-immersive-360-web.vercel.app/';
-}
+
+    // Detectar si estamos en un popup y verificar capacidades VR
+    function checkVRCapabilities() {
+      const isPopup = window.opener !== null || window.parent !== window;
+      const hasVRSupport = 'xr' in navigator || 'getVRDisplays' in navigator;
+      
+      if (isPopup && hasVRSupport) {
+        // Verificar si las APIs de VR están realmente disponibles
+        checkVRAPIs().then(vrAvailable => {
+          if (!vrAvailable) {
+            showPopupWarning();
+          }
+        });
+      }
+    }
+
+    // Verificar APIs de VR específicas
+    async function checkVRAPIs() {
+      try {
+        // Verificar WebXR
+        if ('xr' in navigator) {
+          const supported = await navigator.xr.isSessionSupported('immersive-vr');
+          if (supported) return true;
+        }
+        
+        // Verificar WebVR (legacy)
+        if ('getVRDisplays' in navigator) {
+          const displays = await navigator.getVRDisplays();
+          if (displays.length > 0) return true;
+        }
+        
+        // Verificar sensores de orientación
+        if ('DeviceOrientationEvent' in window) {
+          return true;
+        }
+        
+        return false;
+      } catch (error) {
+        console.warn('Error verificando VR APIs:', error);
+        return false;
+      }
+    }
+
+    // Mostrar advertencia de popup
+    function showPopupWarning() {
+      document.getElementById('popup-warning').style.display = 'block';
+    }
+
+    // Abrir en ventana principal
+    function openInMainWindow() {
+      const currentUrl = window.location.href;
+      if (window.opener) {
+        window.opener.location.href = currentUrl;
+        window.close();
+      } else {
+        window.open(currentUrl, '_blank', 'width=' + screen.width + ',height=' + screen.height + ',fullscreen=yes');
+        window.close();
+      }
+    }
+
+    // Continuar sin VR
+    function continueInPopup() {
+      document.getElementById('popup-warning').style.display = 'none';
+      // Forzar modo sin VR
+      if (typeof krpano !== 'undefined') {
+        krpano.set('webvr.enabled', false);
+        krpano.set('gyro.enabled', false);
+      }
+    }
+
+    // Configuración mejorada para VR
+    function setupVRConfiguration() {
+      // Solicitar permisos de sensores si es necesario
+      if ('DeviceMotionEvent' in window && typeof DeviceMotionEvent.requestPermission === 'function') {
+        DeviceMotionEvent.requestPermission();
+      }
+      
+      if ('DeviceOrientationEvent' in window && typeof DeviceOrientationEvent.requestPermission === 'function') {
+        DeviceOrientationEvent.requestPermission();
+      }
+    }
+
+    // Verificar capacidades al cargar
+    window.addEventListener('load', function() {
+      checkVRCapabilities();
+      setupVRConfiguration();
+    });
     
     embedpano({
       xml: "tour.xml",
@@ -106,8 +189,33 @@ function goBack() {
         dollhouseEnable: "true",
         punlicPath: "..",
         imagePx: "",
-        curtime:"",
+        curtime: "",
+        // Configuraciones adicionales para VR
+        webvr: "auto",
+        webvr_keeplookingdirection: "true",
+        webvr_prev_next_hotspots: "true",
+        gyro: "true",
+        gyro_offset: "0",
+        touch_config: "auto"
       },
+      onready: function() {
+        console.log("Tour virtual cargado - VR habilitado");
+        
+        // Verificar si VR está realmente disponible después de cargar
+        setTimeout(() => {
+          if (typeof krpano !== 'undefined') {
+            const vrEnabled = krpano.get('webvr.available');
+            const gyroEnabled = krpano.get('gyro.available');
+            
+            console.log('VR disponible:', vrEnabled);
+            console.log('Gyro disponible:', gyroEnabled);
+            
+            if (!vrEnabled && !gyroEnabled && (window.opener !== null || window.parent !== window)) {
+              showPopupWarning();
+            }
+          }
+        }, 2000);
+      }
     });
   </script>
 </div>
