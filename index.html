@@ -13,8 +13,8 @@
   <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
   <meta http-equiv="x-ua-compatible" content="IE=edge" />
   
-  <!-- Permisos adicionales para VR -->
-  <meta http-equiv="Permissions-Policy" content="xr-spatial-tracking=*, gyroscope=*, accelerometer=*, magnetometer=*" />
+  <!-- Permisos forzados para VR en cualquier contexto -->
+  <meta http-equiv="Permissions-Policy" content="xr-spatial-tracking=*, gyroscope=*, accelerometer=*, magnetometer=*, camera=*, microphone=*" />
   
   <style>
     html {
@@ -31,48 +31,9 @@
       color: #ffffff;
       background-color: #000000;
     }
-
-    /* Alerta para popup */
-    .popup-warning {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(0, 0, 0, 0.9);
-      color: white;
-      padding: 30px;
-      border-radius: 10px;
-      text-align: center;
-      z-index: 3000;
-      max-width: 400px;
-      border: 2px solid #024731;
-    }
-
-    .popup-warning button {
-      background-color: #024731;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      margin: 10px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    .popup-warning button:hover {
-      background-color: #035a42;
-    }
   </style>
 </head>
 <body>
-
-<!-- Alerta para popup (se muestra solo si es necesario) -->
-<div id="popup-warning" class="popup-warning" style="display: none;">
-  <h3>⚠️ Modo VR No Disponible</h3>
-  <p>Para usar lentes de Realidad Virtual, necesitas abrir este tour en una ventana principal.</p>
-  <button onclick="openInMainWindow()">Abrir en Ventana Principal</button>
-  <button onclick="continueInPopup()">Continuar Sin VR</button>
-</div>
 
 <canvas id="image_helper" style="width: 0; display: none"></canvas>
 
@@ -94,92 +55,27 @@
   <script>
     const isPc = false;
 
-    // Detectar si estamos en un popup y verificar capacidades VR
-    function checkVRCapabilities() {
-      const isPopup = window.opener !== null || window.parent !== window;
-      const hasVRSupport = 'xr' in navigator || 'getVRDisplays' in navigator;
-      
-      if (isPopup && hasVRSupport) {
-        // Verificar si las APIs de VR están realmente disponibles
-        checkVRAPIs().then(vrAvailable => {
-          if (!vrAvailable) {
-            showPopupWarning();
-          }
-        });
-      }
-    }
-
-    // Verificar APIs de VR específicas
-    async function checkVRAPIs() {
-      try {
-        // Verificar WebXR
-        if ('xr' in navigator) {
-          const supported = await navigator.xr.isSessionSupported('immersive-vr');
-          if (supported) return true;
-        }
-        
-        // Verificar WebVR (legacy)
-        if ('getVRDisplays' in navigator) {
-          const displays = await navigator.getVRDisplays();
-          if (displays.length > 0) return true;
-        }
-        
-        // Verificar sensores de orientación
-        if ('DeviceOrientationEvent' in window) {
-          return true;
-        }
-        
-        return false;
-      } catch (error) {
-        console.warn('Error verificando VR APIs:', error);
-        return false;
-      }
-    }
-
-    // Mostrar advertencia de popup
-    function showPopupWarning() {
-      document.getElementById('popup-warning').style.display = 'block';
-    }
-
-    // Abrir en ventana principal
-    function openInMainWindow() {
-      const currentUrl = window.location.href;
-      if (window.opener) {
-        window.opener.location.href = currentUrl;
-        window.close();
-      } else {
-        window.open(currentUrl, '_blank', 'width=' + screen.width + ',height=' + screen.height + ',fullscreen=yes');
-        window.close();
-      }
-    }
-
-    // Continuar sin VR
-    function continueInPopup() {
-      document.getElementById('popup-warning').style.display = 'none';
-      // Forzar modo sin VR
-      if (typeof krpano !== 'undefined') {
-        krpano.set('webvr.enabled', false);
-        krpano.set('gyro.enabled', false);
-      }
-    }
-
-    // Configuración mejorada para VR
-    function setupVRConfiguration() {
-      // Solicitar permisos de sensores si es necesario
+    // Forzar permisos VR inmediatamente
+    function forceVRPermissions() {
+      // Solicitar todos los permisos necesarios sin verificaciones
       if ('DeviceMotionEvent' in window && typeof DeviceMotionEvent.requestPermission === 'function') {
-        DeviceMotionEvent.requestPermission();
+        DeviceMotionEvent.requestPermission().catch(() => {});
       }
       
       if ('DeviceOrientationEvent' in window && typeof DeviceOrientationEvent.requestPermission === 'function') {
-        DeviceOrientationEvent.requestPermission();
+        DeviceOrientationEvent.requestPermission().catch(() => {});
+      }
+
+      // Forzar contexto seguro para VR
+      if ('permissions' in navigator) {
+        navigator.permissions.query({name: 'gyroscope'}).catch(() => {});
+        navigator.permissions.query({name: 'accelerometer'}).catch(() => {});
+        navigator.permissions.query({name: 'magnetometer'}).catch(() => {});
       }
     }
 
-    // Verificar capacidades al cargar
-    window.addEventListener('load', function() {
-      checkVRCapabilities();
-      setupVRConfiguration();
-    });
+    // Ejecutar inmediatamente al cargar
+    forceVRPermissions();
     
     embedpano({
       xml: "tour.xml",
@@ -190,33 +86,48 @@
         punlicPath: "..",
         imagePx: "",
         curtime: "",
-        // Configuraciones adicionales para VR
-        webvr: "auto",
+        // Configuración VR forzada para cualquier contexto
+        webvr: "true",
+        webvr_enabled: "true",
         webvr_keeplookingdirection: "true",
         webvr_prev_next_hotspots: "true",
+        webvr_gyro_damping: "1.0",
         gyro: "true",
+        gyro_enabled: "true",
         gyro_offset: "0",
-        touch_config: "auto"
+        gyro_damping: "1.0",
+        touch_config: "auto",
+        // Forzar habilitación sin verificaciones
+        webvr_support: "true",
+        gyro_support: "true"
       },
       onready: function() {
-        console.log("Tour virtual cargado - VR habilitado");
+        console.log("Tour virtual cargado - VR forzado");
         
-        // Verificar si VR está realmente disponible después de cargar
-        setTimeout(() => {
-          if (typeof krpano !== 'undefined') {
-            const vrEnabled = krpano.get('webvr.available');
-            const gyroEnabled = krpano.get('gyro.available');
+        // Forzar habilitación VR después de cargar
+        if (typeof krpano !== 'undefined') {
+          try {
+            // Forzar configuraciones VR
+            krpano.set('webvr.enabled', true);
+            krpano.set('webvr.available', true);
+            krpano.set('gyro.enabled', true);
+            krpano.set('gyro.available', true);
             
-            console.log('VR disponible:', vrEnabled);
-            console.log('Gyro disponible:', gyroEnabled);
-            
-            if (!vrEnabled && !gyroEnabled && (window.opener !== null || window.parent !== window)) {
-              showPopupWarning();
-            }
+            console.log('VR forzado - Estado:', {
+              webvr: krpano.get('webvr.enabled'),
+              gyro: krpano.get('gyro.enabled')
+            });
+          } catch (error) {
+            console.warn('Error configurando VR:', error);
           }
-        }, 2000);
+        }
       }
     });
+
+    // Forzar permisos adicionales después de un delay
+    setTimeout(() => {
+      forceVRPermissions();
+    }, 1000);
   </script>
 </div>
 </body>
