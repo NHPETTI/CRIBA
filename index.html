@@ -93,14 +93,24 @@
   <script>
     const isPc = false;
     
-    // Función para volver - SOLO ESTA FUNCIÓN ES NUEVA
+    // Función para volver a la página anterior del historial
     function goBack() {
-      if (window.history.length > 1) {
-        window.history.back();
-      } else {
-        window.location.href = '/';
-      }
+  try {
+    // Verificar si hay historial disponible
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      // Si no hay historial, mostrar mensaje o redirigir
+      console.log('No hay páginas anteriores en el historial');
+      // Opcional: redirigir a una página específica
+      // window.location.href = '/inicio';
     }
+  } catch (error) {
+    console.error('Error al navegar hacia atrás:', error);
+    // Fallback: intentar redirigir a la página anterior
+    window.location.href = document.referrer || '/';
+  }
+}
     
     embedpano({
       xml: "tour.xml",
